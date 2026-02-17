@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Mission Contributions</h2>
+<p>Target: {{mission.target_ksh}} KES</p>
+<p>Collected: {{mission.collected_ksh}} KES</p>
+<p>Progress: {{percent}}%</p>
+<p>Remaining: {{remaining}}%</p>
+{% endblock %}

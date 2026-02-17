@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>All Payments</h2>
+<table>
+<tr><th>Name</th><th>Category</th><th>KES</th><th>USD</th></tr>
+{% for p in payments %}
+<tr>
+<td>{{p.full_name}}</td>
+<td>{{p.category}}</td>
+<td>{{p.amount_ksh}}</td>
+<td>{{p.amount_usd}}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
