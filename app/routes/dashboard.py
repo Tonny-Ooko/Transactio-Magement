@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
-from app.models.payment import Payment
+from ..models import Payment, MissionGoal
 from flask_login import login_required
+
 
 
 dashboard_bp = Blueprint("dashboard", __name__)

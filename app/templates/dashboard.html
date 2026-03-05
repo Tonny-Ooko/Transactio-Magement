@@ -1,15 +1,191 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>All Payments</h2>
-<table>
-<tr><th>Name</th><th>Category</th><th>KES</th><th>USD</th></tr>
-{% for p in payments %}
-<tr>
-<td>{{p.full_name}}</td>
-<td>{{p.category}}</td>
-<td>{{p.amount_ksh}}</td>
-<td>{{p.amount_usd}}</td>
-</tr>
-{% endfor %}
-</table>
+
+<div class="page-wrapper">
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">All Payments</h2>
+      <p class="page-subtitle">Track and review incoming M-PESA transactions in real time.</p>
+    </div>
+    <div class="page-actions">
+      <input type="text" placeholder="Search payments..." class="search-input" />
+    </div>
+  </div>
+
+  <div class="card table-card">
+    <div class="table-responsive">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th class="text-right">KES</th>
+            <th class="text-right">USD</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in payments %}
+          <tr>
+            <td class="name-cell">{{ p.full_name }}</td>
+            <td>
+              <span class="badge">{{ p.category }}</span>
+            </td>
+            <td class="text-right amount-ksh">{{ p.amount_ksh }}</td>
+            <td class="text-right amount-usd">{{ p.amount_usd }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="4" class="empty-state">
+              No payments yet. Transactions will appear here once received.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ===== Page Layout ===== */
+.page-wrapper {
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(90deg, #1e3a8a, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.page-subtitle {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+/* ===== Search ===== */
+.search-input {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  outline: none;
+  font-size: 0.9rem;
+  min-width: 220px;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* ===== Card ===== */
+.table-card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+  overflow: hidden;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* ===== Table ===== */
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.modern-table thead {
+  background: linear-gradient(90deg, #1d4ed8, #f97316);
+  color: white;
+}
+
+.modern-table th {
+  text-align: left;
+  padding: 14px 18px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.modern-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.modern-table tbody tr {
+  transition: background 0.18s ease;
+}
+
+.modern-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* ===== Cells ===== */
+.text-right {
+  text-align: right;
+}
+
+.name-cell {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.amount-ksh {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.amount-usd {
+  color: #ea580c;
+  font-weight: 600;
+}
+
+/* ===== Badge ===== */
+.badge {
+  background: linear-gradient(90deg, rgba(37,99,235,0.12), rgba(249,115,22,0.18));
+  color: #334155;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 640px) {
+  .page-wrapper {
+    padding: 16px;
+  }
+
+  .search-input {
+    width: 100%;
+    min-width: unset;
+  }
+}
+</style>
+
 {% endblock %}

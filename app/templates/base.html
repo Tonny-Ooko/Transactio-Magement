@@ -1,15 +1,161 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>M-PESA Accounting</title>
-  <link rel="stylesheet" href="/static/style.css">
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --blue: #0f4c81;
+      --blue-soft: #1e6fb9;
+      --orange: #ff7a18;
+      --orange-soft: #ffa24d;
+      --bg: #f6f9fc;
+      --text: #1f2937;
+      --card: #ffffff;
+      --border: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* NAVBAR */
+    nav {
+      background: linear-gradient(90deg, var(--blue), var(--blue-soft));
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: white;
+      font-weight: 600;
+      font-size: 18px;
+      letter-spacing: 0.4px;
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--orange), var(--orange-soft));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      box-shadow: 0 6px 14px rgba(255,122,24,0.35);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 22px;
+    }
+
+    nav a {
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 10px;
+      transition: all 0.25s ease;
+    }
+
+    nav a:hover {
+      background: rgba(255,255,255,0.12);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    nav a.active {
+      background: linear-gradient(135deg, var(--orange), var(--orange-soft));
+      color: white;
+      box-shadow: 0 6px 16px rgba(255,122,24,0.35);
+    }
+
+    /* MAIN CONTENT */
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* MOBILE */
+    @media (max-width: 640px) {
+      nav {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .nav-links {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
 </head>
+
 <body>
   <nav>
-    <a href="/">Dashboard</a>
-    <a href="/mission">Mission</a>
-    <a href="/logout">Logout</a>
+    <div class="nav-left">
+      <div class="logo">M</div>
+      <span>M‑PESA Accounting</span>
+    </div>
+
+    <div class="nav-links">
+      <a href="/" class="active">Dashboard</a>
+      <a href="/mission">Mission</a>
+    </div>
   </nav>
-  {% block content %}{% endblock %}
+
+  <main class="container">
+    <div class="card">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
 </body>
 </html>
+

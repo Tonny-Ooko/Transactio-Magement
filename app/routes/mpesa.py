@@ -1,24 +1,28 @@
 from flask import Flask, request, jsonify
-from config import Config
-from models import db, Transaction, Payment, MissionGoal
-from services import kes_to_usd, categorize
+from ..models import db, Transaction, Payment, MissionGoal
+from ..services import kes_to_usd, categorize
+from ..config import Config
+from flask import Blueprint
+
+# Create the Blueprint
+mpesa_bp = Blueprint('mpesa', __name__)
+
+# Example route
+@mpesa_bp.route('/mpesa')
+def mpesa_index():
+    return "Hello Mpesa"
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 db.init_app(app)
 
-with app.app_context():
-    db.create_all()
+def create_initial_mission_goal():
+    from ..models import MissionGoal  # import here to avoid circular import
+    goal = MissionGoal(target_ksh=500000, target_usd=3000)
+    db.session.add(goal)
+    db.session.commit()
 
-    # Ensure one mission row exists
-    if not MissionGoal.query.first():
-        mission = MissionGoal(
-            target_ksh=500000,
-            target_usd=3000
-        )
-        db.session.add(mission)
-        db.session.commit()
 
 
 # -----------------------------

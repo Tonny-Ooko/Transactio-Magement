@@ -1,8 +1,257 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Mission Contributions</h2>
-<p>Target: {{mission.target_ksh}} KES</p>
-<p>Collected: {{mission.collected_ksh}} KES</p>
-<p>Progress: {{percent}}%</p>
-<p>Remaining: {{remaining}}%</p>
+
+<div class="mission-container">
+
+  <!-- Header -->
+  <div class="mission-header">
+    <div>
+      <h2 id="missionTitle">{{ mission.name or "Mission Contributions" }}</h2>
+      <p class="subtitle">Track progress toward the set goal</p>
+    </div>
+
+    <!-- Admin Edit Button -->
+    <button class="edit-btn" onclick="openModal()">✏️ Edit</button>
+  </div>
+
+  <!-- Stats + Chart -->
+  <div class="mission-grid">
+
+    <!-- Donut Chart -->
+    <div class="chart-card">
+      <canvas id="progressChart"></canvas>
+      <div class="chart-center">
+        <span class="big" id="percentText">{{ percent }}%</span>
+        <span class="small">Collected</span>
+      </div>
+    </div>
+
+    <!-- Financial Summary -->
+    <div class="stats-card">
+
+      <div class="stat-row">
+        <span>🎯 Target (KES)</span>
+        <strong id="targetKes">{{ mission.target_ksh }}</strong>
+      </div>
+
+      <div class="stat-row">
+        <span>💰 Collected (KES)</span>
+        <strong class="success" id="collectedKes">{{ mission.collected_ksh }}</strong>
+      </div>
+
+      <div class="stat-row">
+        <span>📉 Remaining (%)</span>
+        <strong class="warning" id="remainingPercent">{{ remaining }}%</strong>
+      </div>
+
+      <div class="stat-row">
+        <span>💵 Target (USD)</span>
+        <strong id="targetUsd">{{ mission.target_usd or "-" }}</strong>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL ================= -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Edit Contribution</h3>
+      <span class="close" onclick="closeModal()">×</span>
+    </div>
+    <form method="POST" action="/admin/mission/update" class="modal-form">
+
+        <input type="hidden" name="mission_id" value="{{ mission.id }}">
+
+         <label>Contribution Name</label>
+         <input type="text" name="name" value="{{ mission.name }}" required>
+
+         <label>Target (KES)</label>
+         <input type="number" id="target_ksh" name="target_ksh" value="{{ mission.target_ksh }}" required>
+
+         <label>Target (USD)</label>
+         <input type="number" id="target_usd" name="target_usd" value="{{ mission.target_usd or 0 }}" readonly>
+
+         <button type="submit" class="save-btn">Save Changes</button>
+</form>
+  </div>
+</div>
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+  const kesInput = document.getElementById("target_ksh");
+  const usdInput = document.getElementById("target_usd");
+
+  kesInput.addEventListener("input", async function () {
+    const amount = kesInput.value;
+
+    if (!amount) {
+      usdInput.value = 0;
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/convert/kes-to-usd?amount=${amount}`);
+      const data = await res.json();
+      usdInput.value = data.usd;
+    } catch (err) {
+      console.error("Conversion failed");
+    }
+  });
+});
+</script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+let chart;
+
+function createChart(percent, remaining) {
+  const ctx = document.getElementById('progressChart');
+
+  chart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Collected', 'Remaining'],
+      datasets: [{
+        data: [percent, remaining],
+        backgroundColor: ['#2563eb', '#e5e7eb'],
+        borderWidth: 0,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      cutout: '72%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { usePointStyle: true }
+        }
+      },
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+}
+
+// INITIAL LOAD
+createChart({{ percent }}, {{ remaining }});
+
+
+// 🔄 LIVE AUTO UPDATE (every 10s)
+async function refreshProgress() {
+  try {
+    const res = await fetch("/api/mission-progress");
+    const data = await res.json();
+
+    // Update text
+    document.getElementById("missionTitle").innerText = data.name;
+    document.getElementById("percentText").innerText = data.percent + "%";
+    document.getElementById("targetKes").innerText = data.target_ksh;
+    document.getElementById("collectedKes").innerText = data.collected_ksh;
+    document.getElementById("remainingPercent").innerText = data.remaining + "%";
+    document.getElementById("targetUsd").innerText = data.target_usd ?? "-";
+
+    // Update chart
+    chart.data.datasets[0].data = [data.percent, data.remaining];
+    chart.update();
+
+  } catch (e) {
+    console.log("Auto refresh failed");
+  }
+}
+
+// poll every 10 seconds
+setInterval(refreshProgress, 10000);
+
+
+// 🎯 MODAL CONTROLS
+function openModal() {
+  document.getElementById("editModal").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("editModal").style.display = "none";
+}
+
+window.onclick = function(e) {
+  const modal = document.getElementById("editModal");
+  if (e.target === modal) closeModal();
+};
+</script>
+
+<style>
+/* ===== Header ===== */
+.mission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #2563eb, #f97316);
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ===== Modal ===== */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.55);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 28px;
+  border-radius: 16px;
+  width: 420px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.close {
+  cursor: pointer;
+  font-size: 22px;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-form input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.save-btn {
+  margin-top: 10px;
+  background: linear-gradient(135deg, #2563eb, #f97316);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+</style>
+
 {% endblock %}

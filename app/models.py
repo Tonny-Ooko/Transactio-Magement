@@ -1,13 +1,22 @@
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_login import UserMixin
+from .extensions import db
 
-db = SQLAlchemy()
 
 
+
+class User(UserMixin, db.Model):
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(50), default="accountant")
 # -----------------------------
 # MPESA TRANSACTIONS
 # -----------------------------
 class Transaction(db.Model):
+    __tablename__ = "transactions"
     id = db.Column(db.Integer, primary_key=True)
     trans_id = db.Column(db.String(50), unique=True, nullable=False)
     phone_number = db.Column(db.String(20))
