@@ -6,7 +6,6 @@ brotlicffi==1.2.0.1
 colorama==0.4.6
 ConfigParser==7.2.0
 cryptography==46.0.5
-cx_Oracle==8.3.0
 defusedxml==0.7.1
 docutils==0.22.4
 dogpile.core==0.4.1
